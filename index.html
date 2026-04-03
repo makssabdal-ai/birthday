@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="https://img.icons8.com/external-stickers-smashing-stocks/70/external-Bow-Hat-happy-birthday-stickers-smashing-stocks.png">
+<title>Приглашение</title>
+
+<style>
+
+html, body {
+    height: auto;
+}
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #ffd6e7;
+    	min-height: 100vh;   /* важно */
+    	overflow-x: hidden;  /* только горизонталь блокируем */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .container {
+        background: rgba(255,255,255,0.6);
+        padding: 25px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 10;
+        max-width: 90vw;
+    }
+
+    h1 {
+        font-size: 22px;
+        max-width: 100%;
+    }
+
+    input {
+        width: 80%;
+        max-width: 250px;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 10px;
+        border: none;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    button {
+        margin-top: 10px;
+        padding: 10px 18px;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        background: #ff8fb1;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    .error {
+        color: #ff3b6b;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .hidden { display: none; }
+
+    img {
+        margin-top: 20px;
+        max-width: 80%;
+        border-radius: 20px;
+        animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0; transform: scale(0.9);}
+        to {opacity: 1; transform: scale(1);}
+    }
+
+    /* бантики */
+    .bow {
+        position: absolute;
+        font-size: 22px;
+        pointer-events: none;
+    }
+
+    /* шарики */
+    .balloon {
+        position: absolute;
+        width: 30px;
+        height: 50px;
+        background: pink;
+        border-radius: 50%;
+        animation: float 8s infinite ease-in;
+    }
+
+    @keyframes float {
+        0% {transform: translateY(100vh);}
+        100% {transform: translateY(-10vh);}
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>чтобы получить приглашение, докажи, что ты не робот, а настоящий друг</h1>
+    <p>Какие цифры на номерах моей машины?</p>
+
+    <input type="text" id="answer" placeholder="введи ответ">
+    <br>
+    <button onclick="checkAnswer()">проверить</button>
+
+    <div id="error" class="error"></div>
+
+    <img id="invite" class="hidden" src="C:\Users\ноут-макс\Downloads\13 (2).png">
+</div>
+
+<script>
+function checkAnswer() {
+    const input = document.getElementById("answer");
+    const error = document.getElementById("error");
+    const invite = document.getElementById("invite");
+
+    if (input.value === "298") {
+        invite.classList.remove("hidden");
+        error.textContent = "";
+    } else {
+        input.value = "";
+        error.textContent = "попробуй еще";
+    }
+}
+
+const card = document.querySelector(".container");
+const bows = [];
+
+/* уменьшено для мобильных */
+const isMobile = window.innerWidth < 768;
+const BOW_COUNT = isMobile ? 18 : 35;
+
+/* шарики */
+for (let i = 0; i < (isMobile ? 5 : 10); i++) {
+    let balloon = document.createElement("div");
+    balloon.className = "balloon";
+    balloon.style.left = Math.random() * 100 + "vw";
+    balloon.style.animationDuration = (5 + Math.random() * 4) + "s";
+    document.body.appendChild(balloon);
+}
+
+/* бантики */
+for (let i = 0; i < BOW_COUNT; i++) {
+    const bow = document.createElement("div");
+    bow.className = "bow";
+    bow.textContent = "🎀";
+
+    bows.push({
+        el: bow,
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * (isMobile ? 0.6 : 1),
+        vy: (Math.random() - 0.5) * (isMobile ? 0.6 : 1)
+    });
+
+    document.body.appendChild(bow);
+}
+
+function animate() {
+    const rect = card.getBoundingClientRect();
+
+    bows.forEach(b => {
+
+        b.x += b.vx;
+        b.y += b.vy;
+
+        if (b.x < 0 || b.x > window.innerWidth) b.vx *= -1;
+        if (b.y < 0 || b.y > window.innerHeight) b.vy *= -1;
+
+        const padding = isMobile ? 20 : 40;
+
+        const insideX = b.x > rect.left - padding && b.x < rect.right + padding;
+        const insideY = b.y > rect.top - padding && b.y < rect.bottom + padding;
+
+        if (insideX && insideY) {
+            const dx = b.x - (rect.left + rect.width / 2);
+            const dy = b.y - (rect.top + rect.height / 2);
+
+            const len = Math.sqrt(dx*dx + dy*dy) || 1;
+
+            b.vx += (dx / len) * (isMobile ? 0.05 : 0.1);
+            b.vy += (dy / len) * (isMobile ? 0.05 : 0.1);
+        }
+
+        b.el.style.left = b.x + "px";
+        b.el.style.top = b.y + "px";
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
